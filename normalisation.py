@@ -168,19 +168,19 @@ def remove_duplicates(L):
     return back_to_list(to_frozenset(L))
 
 
-#Returns a minimalest key if can, False if can't
+#Returns a minimalest key if can, minimal_key if can't. If minimal_key is null, return the minimal possible key, can be att
 def minimalest_key(KEYS,att,minimal_key):
     if minimal_key:
         for ksize in range(1,len(minimal_key)):#can we find a minimalest key?
             for K in [Ki for Ki in KEYS if len(Ki)==ksize]:
                 if set(K) <= set(att):
                     return  K
+        return minimal_key
     else:
         for ksize in range(1,len(att)+1):
             for K in [Ki for Ki in KEYS if len(Ki)==ksize]:
                 if set(K) <= set(att):
                     return K
-    return False
 
 #Gives 3NF (or Bernstein) normalisation
 #
