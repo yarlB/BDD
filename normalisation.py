@@ -205,14 +205,14 @@ def THIRD_NF(ATT,DF):
         else:
             CV_PARTS[X]=[Y]
     Relations = []
-    minimal_key=False
+    minimal_key=[]
     for X in CV_PARTS: #Relations creation
         att = list(set([a for a in X]) | reduce(lambda x,y : x|y, CV_PARTS[X],set())) #I'm lazy right now (lary*)
         minimal_key=minimalest_key(KEYS,att,minimal_key)
         dfs = [[list(X),list(Y)] for Y in CV_PARTS[X]] 
         Relations.append([att,dfs])
     if not minimal_key:
-        Relations.append([list(minimalest_key(KEYS,ATT,[])),[]])
+        Relations.append([list(minimalest_key(KEYS,ATT,minimal_key)),[]])
     R_COPY=Relations
     Relations=[]
     while R_COPY:
