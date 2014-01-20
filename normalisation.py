@@ -175,12 +175,12 @@ def minimalest_key(KEYS,att,minimal_key):
             for K in [Ki for Ki in KEYS if len(Ki)==ksize]:
                 if set(K) <= set(att):
                     return  K
-        return minimal_key
     else:
         for ksize in range(1,len(att)+1):
             for K in [Ki for Ki in KEYS if len(Ki)==ksize]:
                 if set(K) <= set(att):
                     return K
+    return minimal_key
 
 #Gives 3NF (or Bernstein) normalisation
 #
@@ -212,7 +212,7 @@ def THIRD_NF(ATT,DF):
         dfs = [[list(X),list(Y)] for Y in CV_PARTS[X]] 
         Relations.append([att,dfs])
     if not minimal_key:
-        Relations.append([list(minimalest_key(KEYS,ATT,False)),[]])
+        Relations.append([list(minimalest_key(KEYS,ATT,[])),[]])
     R_COPY=Relations
     Relations=[]
     while R_COPY:
@@ -330,3 +330,22 @@ D=THIRD_NF(R,DF)
 print "Finally, in 3NF:"
 print_rels_and_fds(D)
 """
+
+R=["ID_Femme","ID_Adresse","ID_Hebergement","ID_Enfant","attributs_femme","attributs_enfant","attributs_hebergement","attributs_adresse"]
+
+DF=[
+    [["ID_Femme"],["attributs_femme"]],
+    [["ID_Enfant"],["attributs_enfant","ID_Femme"]],
+    [["ID_Hebergement"],["ID_adresse","attributs_hebergement"]],
+    [["ID_adresse"],["attributs_adresse","ID_Hebergement"]]
+]
+
+D=BCNF(R,DF)
+print "Finally, in BCNF:"
+print_rels_and_fds(D)
+print ""
+print ""
+
+D=THIRD_NF(R,DF)
+print "Finally, in 3NF:"
+print_rels_and_fds(D)
