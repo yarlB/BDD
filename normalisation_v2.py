@@ -26,6 +26,24 @@ yarl@sdf.org
 #[['A','B'],['C','D']] is code for A,B-->C,D
 
 
+#Gives 2^A
+#
+#input:
+#A : list of attributes
+#
+#output:
+#U : set of frozensets of attributes
+def P(A):
+    A=frozenset(A)
+    if not A:
+        return set([frozenset()])
+    U=set([A])
+    for x in A:
+        U = U | P(A-frozenset([x]))
+    return U
+
+
+
 #Gives X closure
 #
 #inputs:
@@ -314,27 +332,6 @@ print_rels_and_fds(D)
 print ""
 print ""
 
-D=THIRD_NF(R,DF)
-print "Finally, in 3NF:"
-print_rels_and_fds(D)
-"""
-
-"""
-R=["ID_Femme","ID_Adresse","ID_Hebergement","ID_Enfant","attributs_femme","attributs_enfant","attributs_hebergement","attributs_adresse"]
-
-DF=[
-    [["ID_Femme"],["attributs_femme"]],
-    [["ID_Enfant"],["attributs_enfant","ID_Femme"]],
-    [["ID_Hebergement"],["ID_Adresse","attributs_hebergement"]],
-    [["ID_Adresse"],["attributs_adresse"]]
-]
-
-
-D=BCNF(R,DF)
-print "Finally, in BCNF:"
-print_rels_and_fds(D)
-print ""
-print ""
 D=THIRD_NF(R,DF)
 print "Finally, in 3NF:"
 print_rels_and_fds(D)
