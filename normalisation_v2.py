@@ -26,23 +26,6 @@ yarl@sdf.org
 #[['A','B'],['C','D']] is code for A,B-->C,D
 
 
-#Gives 2^A
-#
-#input:
-#A : list of attributes
-#
-#output:
-#U : set of frozensets of attributes
-def P(A):
-    A=frozenset(A)
-    if not A:
-        return set([frozenset()])
-    U=set([A])
-    for x in A:
-        U = U | P(A-frozenset([x]))
-    return U
-
-
 #Gives X closure
 #
 #inputs:
@@ -127,7 +110,7 @@ def CV(DF):
     return DF
 
 
-#Computes all possible keys (and superkeys) for a list of attributes
+#Computes all possible keys (not superkeys) for a list of attributes
 #
 #inputs:
 #ATT : list
@@ -137,15 +120,29 @@ def CV(DF):
 #set of keys (whose are frozensets)
 def ALL_KEYS(ATT,DF):
     ATT=set(ATT)
-    superset=P(ATT)
     KEYS=set()
-    for A in superset:
-        if A not in KEYS:
-            A_plus = att_closure(A,DF)
-            if A_plus == ATT:
-                #Hihihi, be careful, se becomes es
-                superESt = P(ATT-A)
-                KEYS = KEYS | set([frozenset(A)|frozenset(p) for p in superESt]) # we need to add all superkeys from this one
+    arr = set([frozenset([xi]) for xi in ATT])
+    for x in arr: #maybe there are one-attribute key(s)
+        clos = att_closure(x,DF)
+        if clos == ATT:
+            KEYS = KEYS | set([frozenset(x)])
+    for arrsize in range(len(ATT)-1): # forall arrangement size
+        arr_aux=set()
+        for x in arr: # forall arrangement of size arrsize - 1
+            for a in ATT-x: # we try to add one element, thus we have an arrangement of size arrsize
+                bkeep=True
+                new = set([a]) | x
+                for K in KEYS: 
+                    if K <= new:
+                        bkeep=False
+                        break
+                if bkeep: # if this arrangement doesn't contain an already calculated key
+                    clos = att_closure(list(new),DF)
+                    if clos == ATT: # but is a key
+                        KEYS = KEYS | set([frozenset(new)]) # then we had it to the set of key
+                    else: # if it isn't a key
+                        arr_aux = arr_aux | set([frozenset(new)]) # we keep this arrangement for arrsize+1
+        arr=arr_aux
     return KEYS
 
 
@@ -168,20 +165,6 @@ def remove_duplicates(L):
     return back_to_list(to_frozenset(L))
 
 
-#Returns a minimalest key if can, minimal_key if can't. If minimal_key is null, return the minimal possible key, can be att
-def minimalest_key(KEYS,att,minimal_key):
-    if minimal_key:
-        for ksize in range(1,len(minimal_key)):#can we find a minimalest key?
-            for K in [Ki for Ki in KEYS if len(Ki)==ksize]:
-                if set(K) <= set(att):
-                    return  K
-    else:
-        for ksize in range(1,len(att)+1):
-            for K in [Ki for Ki in KEYS if len(Ki)==ksize]:
-                if set(K) <= set(att):
-                    return K
-    return minimal_key
-
 #Gives 3NF (or Bernstein) normalisation
 #
 #inputs:
@@ -193,7 +176,7 @@ def minimalest_key(KEYS,att,minimal_key):
 def THIRD_NF(ATT,DF):
     ATT=remove_duplicates(ATT) # WE DON'T USE remove_duplicates on DF car DF are ordered (ie X-->Y)
     DF = CV(DF) # DF become minimal cover
-    KEYS = ALL_KEYS(ATT,DF) #We compute every keys (and superkeys)
+    ALL_DF=DF
     CV_PARTS = {}
     while DF: #FDs grouping
         df = DF[0]
@@ -205,14 +188,16 @@ def THIRD_NF(ATT,DF):
         else:
             CV_PARTS[X]=[Y]
     Relations = []
-    minimal_key=[]
     for X in CV_PARTS: #Relations creation
         att = list(set([a for a in X]) | reduce(lambda x,y : x|y, CV_PARTS[X],set())) #I'm lazy right now (lary*)
-        minimal_key=minimalest_key(KEYS,att,minimal_key)
         dfs = [[list(X),list(Y)] for Y in CV_PARTS[X]] 
         Relations.append([att,dfs])
-    if not minimal_key:
-        Relations.append([list(minimalest_key(KEYS,ATT,minimal_key)),[]])
+    for R in Relations:
+        clos = att_closure(R[0],ALL_DF)
+        if clos == ATT:
+            break
+    else:
+        Relations.append([list(ALL_KEYS(ATT,ALL_DF).pop()),[]])
     R_COPY=Relations
     Relations=[]
     while R_COPY:
@@ -229,6 +214,8 @@ def THIRD_NF(ATT,DF):
 
 #Return the first bad fd (for BCNF) found if any xor []
 def BAD_DF(R,DF,KEYS):
+    if not KEYS:
+        return []
     for df in DF:
         X=df[0]
         for K in KEYS:
@@ -255,6 +242,7 @@ def BCNF(ATT,DF):
         R_DF = bad_relations[0]
         bad_relations = bad_relations[1:]
         R,DF = R_DF[0],R_DF[1]
+        print "calculing keys for :",R_DF
         KEYS = ALL_KEYS(R,DF)
         bad_df = BAD_DF(R,DF,KEYS)
         if not bad_df: # If there are no bad fds for the relation, then the relation is BCNF
@@ -331,21 +319,23 @@ print "Finally, in 3NF:"
 print_rels_and_fds(D)
 """
 
+"""
 R=["ID_Femme","ID_Adresse","ID_Hebergement","ID_Enfant","attributs_femme","attributs_enfant","attributs_hebergement","attributs_adresse"]
 
 DF=[
     [["ID_Femme"],["attributs_femme"]],
     [["ID_Enfant"],["attributs_enfant","ID_Femme"]],
-    [["ID_Hebergement"],["ID_adresse","attributs_hebergement"]],
-    [["ID_adresse"],["attributs_adresse","ID_Hebergement"]]
+    [["ID_Hebergement"],["ID_Adresse","attributs_hebergement"]],
+    [["ID_Adresse"],["attributs_adresse"]]
 ]
+
 
 D=BCNF(R,DF)
 print "Finally, in BCNF:"
 print_rels_and_fds(D)
 print ""
 print ""
-
 D=THIRD_NF(R,DF)
 print "Finally, in 3NF:"
 print_rels_and_fds(D)
+"""
