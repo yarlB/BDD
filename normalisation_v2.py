@@ -136,32 +136,43 @@ def CV(DF):
 #
 #output:
 #set of keys (whose are frozensets)
-def ALL_KEYS(ATT,DF):
-    ATT=set(ATT)
-    KEYS=set()
-    arr = set([frozenset([xi]) for xi in ATT])
-    for x in arr: #maybe there are one-attribute key(s)
-        clos = att_closure(x,DF)
-        if clos == ATT:
-            KEYS = KEYS | set([frozenset(x)])
-    for arrsize in range(len(ATT)-1): # forall arrangement size
-        arr_aux=set()
-        for x in arr: # forall arrangement of size arrsize - 1
-            for a in ATT-x: # we try to add one element, thus we have an arrangement of size arrsize
-                bkeep=True
-                new = set([a]) | x
-                for K in KEYS: 
-                    if K <= new:
-                        bkeep=False
-                        break
-                if bkeep: # if this arrangement doesn't contain an already calculated key
-                    clos = att_closure(list(new),DF)
-                    if clos == ATT: # but is a key
-                        KEYS = KEYS | set([frozenset(new)]) # then we had it to the set of key
-                    else: # if it isn't a key
-                        arr_aux = arr_aux | set([frozenset(new)]) # we keep this arrangement for arrsize+1
-        arr=arr_aux
-    return KEYS
+def tri_size(A):
+    T = []
+    i=1
+    while A:
+        T = T + [x for x in A if len(x)==i]
+        A = A-set(T)
+        i=i+1
+    return T
+
+
+def ALL_KEYS(R,F):
+    #F=CV(F)
+    R=set(R)
+    LHS = set()
+    RHS = set()
+    for f in F:
+        LHS = LHS | set(f[0])
+        RHS = RHS | set(f[1])
+    X = R - RHS # necessary
+    Y = RHS - LHS # useless
+    M = R - (X | Y) # middle-ground
+    if X and att_closure(X,F)==R:
+        return set([frozenset(X)])
+    L=tri_size(P(M) - set([frozenset()]))
+    L=[l|X for l in L]
+    K=set()
+    i=0
+    while L:
+        i=i+1
+        Z=L.pop(0)
+        if att_closure(Z,F) == R:
+            K = K | set([frozenset(Z)])
+            print K
+            for x in L:
+                if set(Z) <= x:
+                    L.remove(x)
+    return K
 
 
 #Three next are one. Only one-depth is used ;P
@@ -215,7 +226,7 @@ def THIRD_NF(ATT,DF):
         if clos == ATT:
             break
     else:
-        Relations.append([list(ALL_KEYS(ATT,ALL_DF).pop()),[]])
+        Relations.append([list(ALL_KEYS(ATT,ALL_DF).pop()),[]])#Merdouille ici
     R_COPY=Relations
     Relations=[]
     while R_COPY:
@@ -260,7 +271,6 @@ def BCNF(ATT,DF):
         R_DF = bad_relations[0]
         bad_relations = bad_relations[1:]
         R,DF = R_DF[0],R_DF[1]
-        print "calculing keys for :",R_DF
         KEYS = ALL_KEYS(R,DF)
         bad_df = BAD_DF(R,DF,KEYS)
         if not bad_df: # If there are no bad fds for the relation, then the relation is BCNF
