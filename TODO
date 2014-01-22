@@ -1,5 +1,5 @@
 Plus judicieux de calculer differement les clés (et superclés) dans ALL_KEYS. 
 En effet, actuellement, on calcul l'ensemble des parties des attributs puis on filtre. A partir d'un ensemble d'attributs supérieur à 10 ça devient long...
 Ce serait mieux? de calculer les permutes à un élément, si y'a un qui est clef, générer toutes les superclefs a partir de lui.
-Faire pareil avec les permutes a 2, puis 3, etc jusqu'a avoir 2^n ensembles ou n est le nombre d'attributs.
+Faire pareil avec les permutes a 2, puis 3, etc.
 On aurait à générer des ensembles de partie AU MOINS d'un plus petit!
