@@ -43,6 +43,15 @@ def P(A):
     return U
 
 
+#Gives DF closure
+#
+#input:
+#list of DF
+#
+#output:
+#set of DF
+def df_closure(DF):
+    Rreflex = lambda x : set([y
 
 #Gives X closure
 #
@@ -226,7 +235,7 @@ def THIRD_NF(ATT,DF):
         if clos == ATT:
             break
     else:
-        Relations.append([list(ALL_KEYS(ATT,ALL_DF).pop()),[]])#Merdouille ici
+        Relations.append([list(ALL_KEYS(ATT,ALL_DF).pop()),[]])
     R_COPY=Relations
     Relations=[]
     while R_COPY:
