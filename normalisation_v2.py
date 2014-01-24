@@ -43,16 +43,6 @@ def P(A):
     return U
 
 
-#Gives DF closure
-#
-#input:
-#list of DF
-#
-#output:
-#set of DF
-def df_closure(DF):
-    Rreflex = lambda x : set([y
-
 #Gives X closure
 #
 #inputs:
