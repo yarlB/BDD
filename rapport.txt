@@ -1,0 +1,17 @@
+Introduction.
+Nous avons choisis de baser notre travail sur les besoins d'une association nantaise d'aide aux femmes victimes de violences.
+Pour faciliter son travail, cette association souhaite une base de données.
+
+Déroulement de notre processus.
+La première étape fut de récolter des informations sur le fonctionnement de l'association en questionnant une représentante et en étudiant différentes fiches lui servant de base de données.
+Ensuite, nous avons utilisé nos connaissances de la méthode Merise pour découper les tables et obtenir un modele conceptuel de données. Nous en avons déduit les dépendances fonctionnelles.
+Avec ces dépendances fonctionnelles et l'union des attributs dans une relation, nous avons utiliser les algorithmes donnés pour voir quelles décompositions ils nous donnaient.
+
+// Lequel on a choisit, pourquoi, astuce utilisée ou pas, pourquoi?
+
+Atouts.
+//Python
+
+Conclusion.
+Nous pensons que nous satisfaisont le travail demandé. Néanmoins, ce travail ne réponds pas à l'attente de l'association.
+
