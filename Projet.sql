@@ -119,3 +119,5 @@ CREATE TABLE Telephone_Portable (
        FOREIGN KEY id_femme REFERENCES Femme(id_femme)
 );     
 
+
+/*prout*/
